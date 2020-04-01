@@ -35,7 +35,7 @@ int lg2_push(git_repository *repo, int argc, char **argv) {
 	git_push_options options;
 	git_remote* remote = NULL;
 	char *refspec = "refs/heads/master";
-    const git_strarray refspecs = {
+	const git_strarray refspecs = {
 		&refspec,
 		1
 	};

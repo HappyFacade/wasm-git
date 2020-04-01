@@ -83,5 +83,5 @@ int lg2_commit(git_repository *repo, int argc, char **argv)
 	git_signature_free(signature);
 	git_tree_free(tree);	
 
-    return error;
+	return error;
 }
