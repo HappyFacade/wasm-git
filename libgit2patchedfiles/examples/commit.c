@@ -34,7 +34,7 @@ int lg2_commit(git_repository *repo, int argc, char **argv)
 	const char *comment = argv[2];
 	int error;
 
-    git_oid commit_oid,tree_oid;
+	git_oid commit_oid,tree_oid;
 	git_tree *tree;
 	git_index *index;	
 	git_object *parent = NULL;
@@ -44,27 +44,32 @@ int lg2_commit(git_repository *repo, int argc, char **argv)
 	(void)repo; /* unused */
 
 	/* Validate args */
-	if (argc < 3 || strcmp(opt, "-m")!=0) {
+	if (argc < 3 || strcmp(opt, "-m") != 0) {
 		printf ("USAGE: %s -m <comment>\n", argv[0]);
 		return -1;
 	}
 
-	git_revparse_ext(&parent, &ref, repo, "HEAD");
-	git_repository_index(&index, repo);	
-	git_index_write_tree(&tree_oid, index);
-	git_index_write(index);
-	git_index_free(index);
-
-	error = git_tree_lookup(&tree, repo, &tree_oid);
-	if (error != 0) {
+	error = git_revparse_ext(&parent, &ref, repo, "HEAD");
+	if ( error == GIT_ENOTFOUND) {
+		printf("HEAD not found. Creating first commit\n");
+		error = 0;
+	} else if (error != 0) {
 		const git_error *err = git_error_last();
 		if (err) printf("ERROR %d: %s\n", err->klass, err->message);
 		else printf("ERROR %d: no detailed info\n", error);
 	}
 
+	check_lg2(git_repository_index(&index, repo), "Could not open repository index", NULL);
+	check_lg2(git_index_write_tree(&tree_oid, index), "Could not write tree", NULL);;
+	check_lg2(git_index_write(index), "Could not write index", NULL);;
+
+	git_index_free(index);
+
+	check_lg2(git_tree_lookup(&tree, repo, &tree_oid), "Error looking up tree", NULL);
+	
 	git_signature_default(&signature, repo);
 	
-	error = git_commit_create_v(
+	check_lg2(git_commit_create_v(
 		&commit_oid,
 		repo,
 		"HEAD",
@@ -73,13 +78,8 @@ int lg2_commit(git_repository *repo, int argc, char **argv)
 		NULL,
 		comment,
 		tree,
-		parent ? 1 : 0, parent);
-		
-	if (error != 0) {
-		const git_error *err = git_error_last();
-		if (err) printf("ERROR %d: %s\n", err->klass, err->message);
-		else printf("ERROR %d: no detailed info\n", error);
-	}
+		parent ? 1 : 0, parent), "Error creating commit", NULL);
+
 	git_signature_free(signature);
 	git_tree_free(tree);	
 
