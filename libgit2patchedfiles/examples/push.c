@@ -31,7 +31,6 @@
 
 /** Entry point for this command */
 int lg2_push(git_repository *repo, int argc, char **argv) {
-    // get the remote.
 	git_push_options options;
 	git_remote* remote = NULL;
 	char *refspec = "refs/heads/master";
