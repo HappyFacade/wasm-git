@@ -41,8 +41,6 @@ int lg2_commit(git_repository *repo, int argc, char **argv)
 	git_reference *ref = NULL;
 	git_signature *signature;	
 
-	(void)repo; /* unused */
-
 	/* Validate args */
 	if (argc < 3 || strcmp(opt, "-m") != 0) {
 		printf ("USAGE: %s -m <comment>\n", argv[0]);
@@ -50,7 +48,7 @@ int lg2_commit(git_repository *repo, int argc, char **argv)
 	}
 
 	error = git_revparse_ext(&parent, &ref, repo, "HEAD");
-	if ( error == GIT_ENOTFOUND) {
+	if (error == GIT_ENOTFOUND) {
 		printf("HEAD not found. Creating first commit\n");
 		error = 0;
 	} else if (error != 0) {
@@ -63,11 +61,9 @@ int lg2_commit(git_repository *repo, int argc, char **argv)
 	check_lg2(git_index_write_tree(&tree_oid, index), "Could not write tree", NULL);;
 	check_lg2(git_index_write(index), "Could not write index", NULL);;
 
-	git_index_free(index);
-
 	check_lg2(git_tree_lookup(&tree, repo, &tree_oid), "Error looking up tree", NULL);
 	
-	git_signature_default(&signature, repo);
+	check_lg2(git_signature_default(&signature, repo), "Error creating signature", NULL);
 	
 	check_lg2(git_commit_create_v(
 		&commit_oid,
@@ -80,6 +76,7 @@ int lg2_commit(git_repository *repo, int argc, char **argv)
 		tree,
 		parent ? 1 : 0, parent), "Error creating commit", NULL);
 
+	git_index_free(index);
 	git_signature_free(signature);
 	git_tree_free(tree);	
 

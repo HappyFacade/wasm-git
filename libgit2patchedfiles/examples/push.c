@@ -45,11 +45,11 @@ int lg2_push(git_repository *repo, int argc, char **argv) {
 		return -1;
 	}
 
-	check_lg2(git_remote_lookup( &remote, repo, "origin" ), "Unable to lookup remote", NULL);
+	check_lg2(git_remote_lookup(&remote, repo, "origin" ), "Unable to lookup remote", NULL);
 	
-	check_lg2(git_push_options_init( &options, GIT_PUSH_OPTIONS_VERSION ), "Error initializing push", NULL);
+	check_lg2(git_push_options_init(&options, GIT_PUSH_OPTIONS_VERSION ), "Error initializing push", NULL);
 
-	check_lg2(git_remote_push( remote, &refspecs, &options), "Error pushing", NULL);
+	check_lg2(git_remote_push(remote, &refspecs, &options), "Error pushing", NULL);
 
 	printf("pushed\n");
 	return 0;
